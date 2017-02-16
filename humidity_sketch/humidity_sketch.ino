@@ -1,35 +1,46 @@
+#include <SparkFun_Si7021_Breakout_Library.h>
 #include <Wire.h>
-#include "i2c.h"
 
-#include "i2c_SI7021.h"
-SI7021 si7021;
+float humidity = 0;
+float tempf = 0;
 
+int power = A3;
+int GND = A2;
 
-void setup()
-{
-    Serial.begin(9600);
+Weather sensor;
 
-    Serial.print("Probe SI7021: ");
-    if (si7021.initialize()) Serial.println("Sensor found!");
-    else
-    {
-        Serial.println("Sensor missing");
-        while(1) {};
-    }
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+
+  pinMode(power, HIGH);
+  pinMode(GND, OUTPUT);
+
+  digitalWrite(power, HIGH);
+  digitalWrite(GND, LOW);
+
+  sensor.begin();
 }
 
-void loop()
-{
-    static float humi, temp;
+void loop() {
+  // put your main code here, to run repeatedly:
+  getWeather();
+  printInfor();
+  delay(1000);
+}
 
-    si7021.getHumidity(humi);
-    si7021.getTemperature(temp);
-    si7021.triggerMeasurement();
+void getWeather(){
+  humidity = sensor.getRH();
 
-    Serial.print("TEMP: ");
-    Serial.print(temp);
-    Serial.print(" HUMI: ");
-    Serial.print(humi);
-    Serial.println("");
+  tempf = sensor.getTempF();
+}
 
+void printInfo(){
+  Serial.print("Temp:");
+  Serial.print(tempf);
+  Serial.print("F, ");
+
+  Serial.print("Humidity:");
+  Serial.print(humidity);
+  Serial.println("%");
 }
